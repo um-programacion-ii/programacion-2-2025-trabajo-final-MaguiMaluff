@@ -18,7 +18,7 @@ logging:
     ROOT: DEBUG
     tech.jhipster: DEBUG
     org.hibernate.SQL: DEBUG
-    ar.edu.um.programacion2: DEBUG
+    ar.edu.um: DEBUG
 
 spring:
   devtools:
@@ -29,7 +29,7 @@ spring:
       enabled: false # we use Webpack dev server + BrowserSync for livereload
   docker:
     compose:
-      enabled: true
+      enabled: false
       profiles:
         active: dev
   jackson:
@@ -37,7 +37,7 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:h2:file:./target/h2db/db/backend;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:file:./target/h2db/db/backend;DB_CLOSE_DELAY=-1;MODE=MYSQL
     username: backend
     password:
     hikari:
@@ -73,12 +73,9 @@ server:
 
 jhipster:
   cache: # Cache configuration
-    redis: # Redis configuration
-      expiration: 3600 # By default objects stay 1 hour (in seconds) in the cache
-      server: redis://localhost:6379
-      cluster: false
-      # server: redis://localhost:6379,redis://localhost:16379,redis://localhost:26379
-      # cluster: true
+    ehcache: # Ehcache configuration
+      time-to-live-seconds: 3600 # By default objects stay 1 hour in the cache
+      max-entries: 100 # Number of objects in each cache entry
   # CORS is only enabled by default with the "dev" profile
   cors:
     # Allow Ionic for JHipster by default (* no longer allowed in Spring Boot 2.4+)
@@ -94,7 +91,7 @@ jhipster:
     authentication:
       jwt:
         # This token must be encoded using Base64 and be at least 256 bits long (you can type `openssl rand -base64 64` on your command line to generate a 512 bits one)
-        base64-secret: M2M0Njg5ZWI4ODU3MjI3NDIzMGJjZGI4NTc0YmI0OGY4ZDZiZTcyNzJlNThjMjg4YWY4YWMxNGI0ZjY3MmVkYmIzODM1ZDg2ZjY5MzBlMzEzMTk0OWMyOTM1NTQ4ZGIxNmQ5M2Q1NTJmZTBmYWQzYjM2MzZmMWMwMTM5YzUwZjg=
+        base64-secret: NjkyMjYxNzg0ZWUzNjA3NDA0ZTBkZWRjMzk5YTM5NDUyYmFjYTlhYzJmMTA4OGZhMmQ5NjFkNzRkMzZkM2E0NTY0YTJjZGJiZGNiOTkyZjgyZWEyOTNjMGM4MmU5ZGUwODE3NTVmMDBiMTFjYmU5ZWY4ZTI2ZjVjN2QxZmRhZTQ=
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
