@@ -3,7 +3,7 @@
                              https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ar.edu.um.programacion2</groupId>
+    <groupId>ar.edu.um</groupId>
     <artifactId>backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -29,7 +29,7 @@
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <start-class>ar.edu.um.programacion2.BackendApp</start-class>
+        <start-class>ar.edu.um.BackendApp</start-class>
         <argLine>-Djava.security.egd=file:/dev/./urandom -Xmx1G</argLine>
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
         <run.addResources>false</run.addResources>
@@ -68,7 +68,6 @@
         <profile.test/>
         <profile.tls/>
         <properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
-        <redisson.version>3.45.1</redisson.version>
         <resource.delimiter>@</resource.delimiter>
         <sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
         <spotless-maven-plugin.version>2.44.3</spotless-maven-plugin.version>
@@ -212,8 +211,17 @@
             <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <classifier>jakarta</classifier>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
@@ -252,11 +260,6 @@
             <artifactId>mapstruct-processor</artifactId>
             <version>${mapstruct.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson</artifactId>
-            <version>${redisson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
@@ -740,7 +743,7 @@
                         <defaultSchemaName/>
                         <username>${liquibase-plugin.username}</username>
                         <password>${liquibase-plugin.password}</password>
-                        <referenceUrl>hibernate:spring:ar.edu.um.programacion2.domain?dialect=${liquibase-plugin.hibernate-dialect}&amp;hibernate.physical_naming_strategy=org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy</referenceUrl>
+                        <referenceUrl>hibernate:spring:ar.edu.um.domain?dialect=${liquibase-plugin.hibernate-dialect}&amp;hibernate.physical_naming_strategy=org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy</referenceUrl>
                         <verbose>true</verbose>
                         <logging>debug</logging>
                         <contexts>!test</contexts>
@@ -822,7 +825,7 @@
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
                             <testExcludes>
-                                <testExclude>ar/edu/um/programacion2/config/PostgreSqlTestContainer.java</testExclude>
+                                <testExclude>ar/edu/um/config/MysqlTestContainer.java</testExclude>
                             </testExcludes>
                         </configuration>
                     </plugin>
@@ -922,22 +925,22 @@
             <id>prod</id>
             <properties>
                 <!-- default Spring profiles -->
-                <liquibase-plugin.driver>org.postgresql.Driver</liquibase-plugin.driver>
-                <liquibase-plugin.hibernate-dialect>org.hibernate.dialect.PostgreSQLDialect</liquibase-plugin.hibernate-dialect>
+                <liquibase-plugin.driver>com.mysql.cj.jdbc.Driver</liquibase-plugin.driver>
+                <liquibase-plugin.hibernate-dialect>org.hibernate.dialect.MySQL8Dialect</liquibase-plugin.hibernate-dialect>
                 <liquibase-plugin.password/>
-                <liquibase-plugin.url>jdbc:postgresql://localhost:5432/backend</liquibase-plugin.url>
-                <liquibase-plugin.username>backend</liquibase-plugin.username>
+                <liquibase-plugin.url>jdbc:mysql://localhost:3306/backend</liquibase-plugin.url>
+                <liquibase-plugin.username>root</liquibase-plugin.username>
                 <profile.test>test,testprod</profile.test>
                 <spring.profiles.active>prod${profile.api-docs}${profile.tls}${profile.e2e}${profile.no-liquibase}</spring.profiles.active>
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>org.postgresql</groupId>
-                    <artifactId>postgresql</artifactId>
+                    <groupId>com.mysql</groupId>
+                    <artifactId>mysql-connector-j</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>org.testcontainers</groupId>
-                    <artifactId>postgresql</artifactId>
+                    <artifactId>mysql</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

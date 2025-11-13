@@ -1,14 +1,10 @@
 # This configuration is intended for development purpose, it's **your** responsibility to harden it for production
 name: backend
 services:
-  postgresql:
+  mysql:
     extends:
-      file: ./postgresql.yml
-      service: postgresql
+      file: ./mysql.yml
+      service: mysql
     profiles:
       - ''
       - prod
-  redis:
-    extends:
-      file: ./redis.yml
-      service: redis
