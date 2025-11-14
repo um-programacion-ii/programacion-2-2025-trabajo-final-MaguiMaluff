@@ -1,0 +1,62 @@
+/**
+ * JDL para Issue 4: Eventos y Ventas
+ * Incluye:
+ *  - Entidades: Evento, EventoIntegrante, Venta, VentaAsiento
+ *  - Relaciones
+ *  - DTOs (mapstruct)
+ *  - Servicios (serviceClass)
+ *  - Paginación para Evento y Venta
+ */
+
+entity Evento {
+  titulo String required maxlength(200)
+  resumen String maxlength(500)
+  descripcion TextBlob
+  fecha Instant required
+  direccion String maxlength(255)
+  imagen String maxlength(1024)
+  filaAsientos Integer required min(1)
+  columnAsientos Integer required min(1)
+  precioEntrada BigDecimal required
+  eventoTipoNombre String maxlength(120)
+  eventoTipoDescripcion String maxlength(255)
+}
+
+entity EventoIntegrante {
+  nombre String required maxlength(120)
+  apellido String required maxlength(120)
+  identificacion String maxlength(60)
+}
+
+entity Venta {
+  fechaVenta Instant required
+  precioVenta BigDecimal required
+  resultado Boolean required
+  descripcion String maxlength(500)
+  cantidadAsientos Integer required min(0) max(4)
+}
+
+entity VentaAsiento {
+  fila Integer required min(1)
+  columna Integer required min(1)
+  persona String required maxlength(255)
+  estado String required maxlength(30)
+}
+
+/* Relaciones */
+relationship OneToMany {
+  Evento{integrantes} to EventoIntegrante{evento required}
+}
+
+relationship ManyToOne {
+  Venta{evento required} to Evento
+  VentaAsiento{venta required} to Venta
+}
+
+/* DTO y Servicios */
+dto * with mapstruct
+service * with serviceClass
+
+/* Paginación */
+paginate Evento with pagination
+paginate Venta with pagination
