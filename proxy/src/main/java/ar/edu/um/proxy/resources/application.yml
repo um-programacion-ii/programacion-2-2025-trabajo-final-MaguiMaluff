@@ -1,0 +1,27 @@
+# application.yml del proxy (plantilla)
+server:
+  port: 8081
+
+spring:
+  application:
+    name: proxy
+  redis:
+    host: ${REDIS_HOST:192.168.194.250}
+    port: ${REDIS_PORT:6379}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:192.168.194.250:9092}
+
+proxy:
+  kafka:
+    topic: ${PROXY_KAFKA_TOPIC:eventos-actualizacion}
+    group-id: ${PROXY_KAFKA_GROUP_ID:alumno-123}
+  redis:
+    host: ${REDIS_HOST:192.168.194.250}
+    port: ${REDIS_PORT:6379}
+  catedra:
+    base-url: ${CATEDRA_BASE_URL:http://192.168.194.250:8080}
+    token: ${CATEDRA_TOKEN:}
+  security:
+    disable: ${PROXY_SECURITY_DISABLE:true}
+    jwk-set-uri: ${PROXY_JWK_SET_URI:}
+    public-key: ${PROXY_PUBLIC_KEY:}
