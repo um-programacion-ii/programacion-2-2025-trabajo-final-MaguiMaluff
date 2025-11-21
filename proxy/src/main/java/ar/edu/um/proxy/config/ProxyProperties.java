@@ -1,8 +1,10 @@
 package ar.edu.um.proxy.config;
 
+import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+@Getter
 @Component
 @ConfigurationProperties(prefix = "proxy")
 public class ProxyProperties {
