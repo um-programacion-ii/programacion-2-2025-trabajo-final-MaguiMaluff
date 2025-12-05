@@ -5,6 +5,13 @@ import java.util.List;
 /**
  * Representa la estructura almacenada en Redis:
  * {"eventoId":1,"asientos":[{"fila":1,"columna":3,"estado":"Bloqueado","expira":"2025-11-20T02:30:32.980225020Z"}, ... ]}
+ *
+ * - Esta clase modela el JSON que se guarda/lee desde Redis.
+ * - AsientoRedisDto contiene además el campo `expira` (string ISO) usado para bloqueos temporales.
+ *
+ * Consideración: si se quiere manipular fechas como objetos, conviene mapear `expira` a Instant/OffsetDateTime
+ * y configurar ObjectMapper para parseo automático. Actualmente es String, lo que evita problemas de formato
+ * pero exige parsing manual si necesitás operar con la fecha.
  */
 public class EventoAsientosDto {
 
@@ -20,7 +27,7 @@ public class EventoAsientosDto {
         private Integer fila;
         private Integer columna;
         private String estado; // Bloqueado / Vendido
-        private String expira; // presente sólo en bloqueos
+        private String expira; // presente sólo en bloqueos (ISO-8601 string)
 
         public AsientoRedisDto() {}
         public AsientoRedisDto(Integer fila, Integer columna, String estado, String expira) {

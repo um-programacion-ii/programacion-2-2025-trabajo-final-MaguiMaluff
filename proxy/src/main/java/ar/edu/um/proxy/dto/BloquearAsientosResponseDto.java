@@ -2,6 +2,16 @@ package ar.edu.um.proxy.dto;
 
 import java.util.List;
 
+/*
+ * DTO de respuesta para operaciones de bloqueo.
+ * - resultado: indica si la operación tuvo éxito.
+ * - descripcion: texto con motivo/descripcion del resultado.
+ * - eventoId: id del evento afectado (útil para correlación).
+ * - asientos: lista de asientos con su estado resultante.
+ *
+ * Este DTO puede ser generado por el upstream (servicio cátedra) y reenviado tal cual
+ * por el proxy si se desea mantener formato original.
+ */
 public class BloquearAsientosResponseDto {
 
     private boolean resultado;
@@ -18,6 +28,11 @@ public class BloquearAsientosResponseDto {
     public List<AsientoEstadoDto> getAsientos() { return asientos; }
     public void setAsientos(List<AsientoEstadoDto> asientos) { this.asientos = asientos; }
 
+    /*
+     * AsientoEstadoDto: estado resultante de cada posición solicitada
+     * - estado: p. ej. "Bloqueado" / "Vendido" / "NoDisponible"
+     * - fila / columna: coordenadas del asiento
+     */
     public static class AsientoEstadoDto {
         private String estado;
         private Integer fila;

@@ -4,6 +4,16 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 
+/*
+ * DTO de request para realizar una venta.
+ * - fecha: se espera una cadena ISO-8601 (el upstream puede parsearla).
+ * - precioVenta: precio aplicado a la venta.
+ * - asientos: lista de asientos con la persona asignada.
+ *
+ * Validaciones:
+ * - NotNull: campos obligatorios
+ * - Size(min=1, max=4): solo permitir ventas de hasta 4 asientos (regla de negocio)
+ */
 public class VentaRequestDto {
 
     @NotNull
@@ -29,6 +39,10 @@ public class VentaRequestDto {
     public List<AsientoVentaDto> getAsientos() { return asientos; }
     public void setAsientos(List<AsientoVentaDto> asientos) { this.asientos = asientos; }
 
+    /*
+     * AsientoVentaDto: además de fila/columna, incluye la persona asociada a la entrada.
+     * - persona puede necesitar validación adicional (p. ej. tamaño, formato).
+     */
     public static class AsientoVentaDto {
         @NotNull
         private Integer fila;

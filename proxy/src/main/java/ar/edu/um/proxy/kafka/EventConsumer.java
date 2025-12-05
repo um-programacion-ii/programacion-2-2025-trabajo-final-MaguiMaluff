@@ -1,3 +1,18 @@
+/*
+ * EventConsumer
+ *
+ * Consumidor de mensajes Kafka del tópico de eventos.
+ * - Escucha mensajes en el tópico configurado (por defecto: "eventos-actualizacion").
+ * - Parsea el mensaje recibido (JSON) para extraer el eventoId.
+ * - Opcionalmente enriquece con los datos completos del evento consultando al servicio de cátedra.
+ * - Notifica al backend los cambios de evento utilizando BackendNotifierService.
+ *
+ * Comportamiento:
+ * - Tolera mensajes no válidos: registra el error de parseo y continúa.
+ * - El enriquecimiento se controla con una propiedad (proxy.kafka.enrich).
+ * - La notificación al backend incluye el mensaje crudo y, si está disponible, el evento completo.
+ */
+
 package ar.edu.um.proxy.kafka;
 
 import ar.edu.um.proxy.client.CatedraClient;
@@ -27,9 +42,16 @@ public class EventConsumer {
         this.enrich = enrich;
     }
 
-    @KafkaListener(topics = "${proxy.kafka.topic:eventos-actualizacion}", groupId = "${proxy.kafka.groupId:proxy-group}")
+    // Escucha mensajes del tópico configurado y usa el groupId definido en application.yml (proxy.kafka.group-id)
+    @KafkaListener(topics = "${proxy.kafka.topic:eventos-actualizacion}", groupId = "${proxy.kafka.group-id:proxy-group}")
     public void consume(String raw) {
+        if (raw == null) {
+            log.warn("Kafka mensaje nulo recibido, se ignora");
+            return;
+        }
+
         log.info("Kafka mensaje recibido ({} bytes)", raw.length());
+
         Long eventoId = null;
         JsonNode node = null;
         try {
@@ -50,6 +72,7 @@ public class EventConsumer {
                 } catch (Exception ignored) {}
             }
         }
+
         notifier.notifyEventoChange(eventoId, raw, eventoCompletoNode);
     }
 }
