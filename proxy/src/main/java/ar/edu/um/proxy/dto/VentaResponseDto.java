@@ -7,8 +7,6 @@ import java.util.List;
  * - Contiene info de la venta (ventaId, fechaVenta), lista de asientos con estado,
  *   y flags/descripciones para el resultado.
  *
- * Reutilizar este DTO: si el upstream ya devuelve exactamente este formato,
- * el proxy puede pasarlo "tal cual" al cliente. Si el upstream varía, hay que mapear.
  */
 public class VentaResponseDto {
 

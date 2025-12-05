@@ -8,9 +8,6 @@ import java.util.List;
  * - descripcion: texto con motivo/descripcion del resultado.
  * - eventoId: id del evento afectado (útil para correlación).
  * - asientos: lista de asientos con su estado resultante.
- *
- * Este DTO puede ser generado por el upstream (servicio cátedra) y reenviado tal cual
- * por el proxy si se desea mantener formato original.
  */
 public class BloquearAsientosResponseDto {
 

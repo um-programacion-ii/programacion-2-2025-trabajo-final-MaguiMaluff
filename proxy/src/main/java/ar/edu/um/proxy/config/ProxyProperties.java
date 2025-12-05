@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
  *
  * Uso:
  * - properties.getBackend().getBaseUrl() devuelve la URL base (p. ej., http://localhost:8080).
- * - Se puede sobreescribir con la variable PROXY_BACKEND_BASE_URL.
  */
 @Getter
 @Component

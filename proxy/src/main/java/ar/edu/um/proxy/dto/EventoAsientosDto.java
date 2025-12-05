@@ -8,10 +8,6 @@ import java.util.List;
  *
  * - Esta clase modela el JSON que se guarda/lee desde Redis.
  * - AsientoRedisDto contiene además el campo `expira` (string ISO) usado para bloqueos temporales.
- *
- * Consideración: si se quiere manipular fechas como objetos, conviene mapear `expira` a Instant/OffsetDateTime
- * y configurar ObjectMapper para parseo automático. Actualmente es String, lo que evita problemas de formato
- * pero exige parsing manual si necesitás operar con la fecha.
  */
 public class EventoAsientosDto {
 

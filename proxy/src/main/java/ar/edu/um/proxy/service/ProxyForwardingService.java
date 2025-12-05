@@ -18,8 +18,8 @@ public class ProxyForwardingService {
     private final RestClient backendClient;
 
     // Ajustar endpoints reales del backend
-    private static final String BLOQUEAR_ENDPOINT = "/api/proxy/bloquear";
-    private static final String VENTA_ENDPOINT = "/api/proxy/venta";
+    private static final String BLOQUEAR_ENDPOINT = "/proxy/bloquear";
+    private static final String VENTA_ENDPOINT = "/proxy/venta";
 
     public ProxyForwardingService(ProxyProperties properties) {
         String baseUrl = properties.getBackend().getBaseUrl();
@@ -36,7 +36,6 @@ public class ProxyForwardingService {
                     .retrieve()
                     .toEntity(String.class);
         } catch (WebClientResponseException httpEx) {
-            // No lo envolvemos: dejamos que el RestExceptionHandler lo procese y propague su status original
             throw httpEx;
         } catch (Exception e) {
             // Errores no-HTTP (conexión, timeouts, etc) -> 400 por defecto via ProxyException

@@ -12,12 +12,6 @@ import org.springframework.security.web.SecurityFilterChain;
  *
  * Configuración de seguridad Web para la aplicación.
  * Actualmente está configurada para deshabilitar CSRF y permitir todas las solicitudes.
- *
- * Importante:
- * - Con permitAll(), no hay autenticación ni autorización aplicada a las rutas.
- *   Esto puede ser aceptable en entornos cerrados, pero en producción generalmente deberías
- *   reemplazar esto por la validación de JWT/HMAC u otro mecanismo.
- * - @EnableMethodSecurity habilita anotaciones como @PreAuthorize a nivel de método.
  */
 @Configuration
 @EnableMethodSecurity

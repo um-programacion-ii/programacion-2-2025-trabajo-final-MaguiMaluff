@@ -50,7 +50,7 @@ public class RestExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
-    // NUEVO: Propaga el status original del upstream (4xx/5xx) devuelto por RestClient/WebClient
+    //Propaga el status original del upstream (4xx/5xx) devuelto por RestClient/WebClient
     @ExceptionHandler(WebClientResponseException.class)
     public ResponseEntity<ErrorBody> handleWebClientResponse(WebClientResponseException ex, HttpServletRequest req) {
         HttpStatus upstreamStatus = (HttpStatus) ex.getStatusCode();

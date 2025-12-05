@@ -19,7 +19,6 @@ public class VentaRequestDto {
     @NotNull
     private Long eventoId;
 
-    // ISO-8601 string (fechaVenta propuesta en payload, aquí la llamamos fecha)
     @NotNull
     private String fecha;
 
@@ -41,7 +40,6 @@ public class VentaRequestDto {
 
     /*
      * AsientoVentaDto: además de fila/columna, incluye la persona asociada a la entrada.
-     * - persona puede necesitar validación adicional (p. ej. tamaño, formato).
      */
     public static class AsientoVentaDto {
         @NotNull

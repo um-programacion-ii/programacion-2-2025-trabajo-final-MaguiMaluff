@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 /*
- * ProxyController (versión comentada y modificada)
+ * ProxyController
  *
  * Cambios principales:
  * - Inyección de ObjectMapper (en lugar de crear new ObjectMapper()) para usar la configuración global de Jackson.
@@ -31,8 +31,6 @@ import jakarta.validation.Valid;
  * - /proxy/bloquear/raw -> recibe JSON crudo como String y lo reenvía tal cual
  * - /proxy/venta -> recibe DTO validado, lo serializa y lo reenvía
  *
- * Notas:
- * - Si prefieres toggle por header para raw-forward, podemos implementarlo. Aquí se optó por claridad y seguridad.
  */
 @RestController
 @RequestMapping("/proxy")
@@ -92,7 +90,6 @@ public class ProxyController {
     /**
      * POST /proxy/bloquear/raw
      * Endpoint explícito para reenviar el JSON tal cual (sin validación DTO).
-     * Útil para pruebas o cuando el frontend ya tiene la estructura exacta que quiere enviar.
      */
     @PostMapping(value = "/bloquear/raw", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> bloquearRaw(@RequestBody String rawPayload) throws Exception {
