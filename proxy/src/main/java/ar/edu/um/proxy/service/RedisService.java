@@ -5,6 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+/*
+ * Servicio para leer datos de Redis.
+ * - Usa RedisTemplate<String,String> para operaciones con valores tipo String.
+ * - getAsientosRaw forma la clave ("evento_{id}") y devuelve el valor crudo (JSON en String).
+ */
 @Service
 public class RedisService {
 

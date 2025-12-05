@@ -7,11 +7,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.stream.Collectors;
 
+/*
+ * RestExceptionHandler
+ *
+ * - Maneja errores comunes y devuelve JSON consistente.
+ * - Handler para WebClientResponseException que preserva el status del upstream.
+ */
 @ControllerAdvice
 public class RestExceptionHandler {
 
@@ -43,6 +50,22 @@ public class RestExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
+    //Propaga el status original del upstream (4xx/5xx) devuelto por RestClient/WebClient
+    @ExceptionHandler(WebClientResponseException.class)
+    public ResponseEntity<ErrorBody> handleWebClientResponse(WebClientResponseException ex, HttpServletRequest req) {
+        HttpStatus upstreamStatus = (HttpStatus) ex.getStatusCode();
+
+        String message = ex.getResponseBodyAsString(); // Cuerpo textual del upstream, si existe
+        ErrorBody body = new ErrorBody(
+                Instant.now().toString(),
+                upstreamStatus.value(),
+                upstreamStatus.getReasonPhrase(),
+                (message == null || message.isBlank()) ? ex.getMessage() : message,
+                req.getRequestURI()
+        );
+        return ResponseEntity.status(upstreamStatus).body(body);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorBody> handleGeneric(Exception ex, HttpServletRequest req) {
         log.error("Unhandled exception: {}", ex.getMessage(), ex);
@@ -51,7 +74,6 @@ public class RestExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
-    // ErrorBody interno para no crear otro DTO suelto
     public static class ErrorBody {
         private String timestamp;
         private int status;

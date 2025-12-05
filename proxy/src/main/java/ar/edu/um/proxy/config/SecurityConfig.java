@@ -7,6 +7,12 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+/*
+ * SecurityConfig
+ *
+ * Configuración de seguridad Web para la aplicación.
+ * Actualmente está configurada para deshabilitar CSRF y permitir todas las solicitudes.
+ */
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -14,8 +20,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .authorizeHttpRequests().anyRequest().permitAll();
+                .csrf().disable() // CSRF deshabilitado (útil para APIs REST que no usan cookies de sesión)
+                .authorizeHttpRequests().anyRequest().permitAll(); // Permitir todo
 
         return http.build();
     }

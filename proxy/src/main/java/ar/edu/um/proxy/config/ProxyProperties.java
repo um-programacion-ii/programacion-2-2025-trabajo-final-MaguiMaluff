@@ -1,8 +1,19 @@
 package ar.edu.um.proxy.config;
 
+import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+/*
+ * ProxyProperties
+ *
+ * - Agrupa propiedades bajo el prefijo "proxy" leídas de application.yml/env.
+ * - kafka, redis, catedra, security, backend (baseUrl) para que el proxy sepa a dónde notificar.
+ *
+ * Uso:
+ * - properties.getBackend().getBaseUrl() devuelve la URL base (p. ej., http://localhost:8080).
+ */
+@Getter
 @Component
 @ConfigurationProperties(prefix = "proxy")
 public class ProxyProperties {
@@ -10,11 +21,13 @@ public class ProxyProperties {
     private final Kafka kafka = new Kafka();
     private final Redis redis = new Redis();
     private final Catedra catedra = new Catedra();
+    private final Backend backend = new Backend(); // NUEVO
     private Security security = new Security();
 
     public Kafka getKafka() { return kafka; }
     public Redis getRedis() { return redis; }
     public Catedra getCatedra() { return catedra; }
+    public Backend getBackend() { return backend; } // NUEVO
     public Security getSecurity() { return security; }
     public void setSecurity(Security security) { this.security = security; }
 
@@ -45,11 +58,17 @@ public class ProxyProperties {
         public void setToken(String token) { this.token = token; }
     }
 
+    public static class Backend {
+        private String baseUrl = "http://localhost:8080";
+        public String getBaseUrl() { return baseUrl; }
+        public void setBaseUrl(String baseUrl) { this.baseUrl = baseUrl; }
+    }
+
     public static class Security {
         private boolean disable = false;
-        private String jwkSetUri;     // opcional
-        private String publicKey;     // opcional (PEM)
-        private String sharedSecret;  // base64 HMAC secret (desde backend jhipster)
+        private String jwkSetUri;
+        private String publicKey;
+        private String sharedSecret;
 
         public boolean isDisable() { return disable; }
         public void setDisable(boolean disable) { this.disable = disable; }
