@@ -7,17 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.context.request.WebRequest;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.stream.Collectors;
 
-/*
- * RestExceptionHandler
- *
- * - Maneja errores comunes y devuelve JSON consistente.
- * - Handler para WebClientResponseException que preserva el status del upstream.
+/**
+ * Handler global de excepciones para devolver JSON consistente.
  */
 @ControllerAdvice
 public class RestExceptionHandler {
@@ -25,53 +21,45 @@ public class RestExceptionHandler {
     private final Logger log = LoggerFactory.getLogger(RestExceptionHandler.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorBody> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest req) {
-        String msg = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(f -> f.getField() + ": " + f.getDefaultMessage())
-                .collect(Collectors.joining(", "));
+    public ResponseEntity<ErrorBody> handleValidation(MethodArgumentNotValidException ex, WebRequest req) {
+        String msg = ex.getBindingResult().getFieldErrors().stream()
+                .map(f -> f.getField() + ": " + f.getDefaultMessage()).collect(Collectors.joining(", "));
+        String path = extractPath(req);
         ErrorBody body = new ErrorBody(Instant.now().toString(), HttpStatus.BAD_REQUEST.value(),
-                "Validation Error", msg, req.getRequestURI());
+                "Validation Error", msg, path);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(ProxyNotFoundException.class)
-    public ResponseEntity<ErrorBody> handleNotFound(ProxyNotFoundException ex, HttpServletRequest req) {
+    public ResponseEntity<ErrorBody> handleNotFound(ProxyNotFoundException ex, WebRequest req) {
+        String path = extractPath(req);
         ErrorBody body = new ErrorBody(Instant.now().toString(), HttpStatus.NOT_FOUND.value(),
-                "Not Found", ex.getMessage(), req.getRequestURI());
+                "Not Found", ex.getMessage(), path);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
     @ExceptionHandler(ProxyException.class)
-    public ResponseEntity<ErrorBody> handleProxy(ProxyException ex, HttpServletRequest req) {
+    public ResponseEntity<ErrorBody> handleProxy(ProxyException ex, WebRequest req) {
+        String path = extractPath(req);
         ErrorBody body = new ErrorBody(Instant.now().toString(), HttpStatus.BAD_REQUEST.value(),
-                "Proxy Error", ex.getMessage(), req.getRequestURI());
+                "Proxy Error", ex.getMessage(), path);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
-    //Propaga el status original del upstream (4xx/5xx) devuelto por RestClient/WebClient
-    @ExceptionHandler(WebClientResponseException.class)
-    public ResponseEntity<ErrorBody> handleWebClientResponse(WebClientResponseException ex, HttpServletRequest req) {
-        HttpStatus upstreamStatus = (HttpStatus) ex.getStatusCode();
-
-        String message = ex.getResponseBodyAsString(); // Cuerpo textual del upstream, si existe
-        ErrorBody body = new ErrorBody(
-                Instant.now().toString(),
-                upstreamStatus.value(),
-                upstreamStatus.getReasonPhrase(),
-                (message == null || message.isBlank()) ? ex.getMessage() : message,
-                req.getRequestURI()
-        );
-        return ResponseEntity.status(upstreamStatus).body(body);
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorBody> handleGeneric(Exception ex, WebRequest req) {
+        log.error("Unhandled exception: {}", ex.getMessage(), ex);
+        String path = extractPath(req);
+        ErrorBody body = new ErrorBody(Instant.now().toString(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Error", "Ocurrió un error interno en el proxy", path);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorBody> handleGeneric(Exception ex, HttpServletRequest req) {
-        log.error("Unhandled exception: {}", ex.getMessage(), ex);
-        ErrorBody body = new ErrorBody(Instant.now().toString(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Error", "Ocurrió un error interno en el proxy", req.getRequestURI());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    private String extractPath(WebRequest req) {
+        String desc = req.getDescription(false);
+        if (desc == null) return "";
+        if (desc.startsWith("uri=")) return desc.substring(4);
+        return desc;
     }
 
     public static class ErrorBody {
@@ -80,14 +68,9 @@ public class RestExceptionHandler {
         private String error;
         private String message;
         private String path;
-
         public ErrorBody() {}
         public ErrorBody(String timestamp, int status, String error, String message, String path) {
-            this.timestamp = timestamp;
-            this.status = status;
-            this.error = error;
-            this.message = message;
-            this.path = path;
+            this.timestamp = timestamp; this.status = status; this.error = error; this.message = message; this.path = path;
         }
         public String getTimestamp() { return timestamp; }
         public void setTimestamp(String timestamp) { this.timestamp = timestamp; }

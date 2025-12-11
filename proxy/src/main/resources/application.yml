@@ -1,35 +1,29 @@
-# application.yml
-#
-# Configuración principal:
-# - Usa variables de entorno para Redis, Kafka y Cátedra.
-# - El token de cátedra se toma SOLO desde la variable CATEDRA_TOKEN (sin valor por defecto).
-# - Evita credenciales hardcodeadas; setear CATEDRA_TOKEN al iniciar.
-
 server:
-  port: 8080
+  port: 8081
 
 spring:
   application:
     name: proxy
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:192.168.194.250:9092}
   redis:
     host: ${REDIS_HOST:192.168.194.250}
     port: ${REDIS_PORT:6379}
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:192.168.194.250:9092}
 
 proxy:
   kafka:
     topic: ${PROXY_KAFKA_TOPIC:eventos-actualizacion}
     group-id: ${PROXY_KAFKA_GROUP_ID:proxy-maguimaluff}
+    enrich: ${PROXY_KAFKA_ENRICH:false}
   redis:
     host: ${REDIS_HOST:192.168.194.250}
     port: ${REDIS_PORT:6379}
   catedra:
     base-url: ${CATEDRA_BASE_URL:http://192.168.194.250:8080}
-    token: ${CATEDRA_TOKEN:}
+    username: ${CATEDRA_USERNAME:magui}
+    password: ${CATEDRA_PASSWORD:holamagui}
+    refresh-interval-ms: ${CATEDRA_REFRESH_INTERVAL_MS:1800000}
   backend:
     base-url: ${PROXY_BACKEND_BASE_URL:http://localhost:8080}
   security:
     disable: ${PROXY_SECURITY_DISABLE:true}
-    jwk-set-uri: ${PROXY_JWK_SET_URI:}
-    public-key: ${PROXY_PUBLIC_KEY:}

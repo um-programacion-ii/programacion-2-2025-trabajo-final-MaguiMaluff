@@ -5,38 +5,37 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
-/*
- * WebClientConfig
- *
- * - Define un único bean WebClient llamado 'webClient' con baseUrl y headers
- *   tomados de ProxyProperties (proxy.catedra.*).
- * - Si proxy.catedra.token está presente, se añade como Bearer a todas las peticiones.
+/**
+ * Beans WebClient para cátedra y backend.
+ * Se nombran para inyección explícita en adaptadores.
  */
 @Configuration
 public class WebClientConfig {
 
-    private final ProxyProperties proxyProperties;
+    private final ProxyProperties props;
 
-    public WebClientConfig(ProxyProperties proxyProperties) {
-        this.proxyProperties = proxyProperties;
+    public WebClientConfig(ProxyProperties props) {
+        this.props = props;
     }
 
-    @Bean
-    public WebClient webClient() {
-        WebClient.Builder builder = WebClient.builder()
-                .baseUrl(proxyProperties.getCatedra().getBaseUrl())
-                .exchangeStrategies(
-                        ExchangeStrategies.builder()
-                                .codecs(c -> c.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
-                                .build()
-                )
-                .defaultHeader("Content-Type", "application/json");
+    @Bean("catedraWebClient")
+    public WebClient catedraWebClient() {
+        return WebClient.builder()
+                .baseUrl(props.getCatedra().getBaseUrl())
+                .defaultHeader("Content-Type", "application/json")
+                .defaultHeader("Accept", "application/json")
+                .exchangeStrategies(ExchangeStrategies.builder()
+                        .codecs(cfg -> cfg.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
+                        .build())
+                .build();
+    }
 
-        String token = proxyProperties.getCatedra().getToken();
-        if (token != null && !token.isBlank()) {
-            builder.defaultHeaders(h -> h.setBearerAuth(token));
-        }
-
-        return builder.build();
+    @Bean("backendWebClient")
+    public WebClient backendWebClient() {
+        return WebClient.builder()
+                .baseUrl(props.getBackend().getBaseUrl())
+                .defaultHeader("Content-Type", "application/json")
+                .defaultHeader("Accept", "application/json")
+                .build();
     }
 }
