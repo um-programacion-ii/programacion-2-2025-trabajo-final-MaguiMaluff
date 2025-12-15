@@ -10,9 +10,8 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 
-/*
- * KafkaConfig (fuente única: Spring)
- * - Toma bootstrap-servers y resto desde application.yml vía KafkaProperties.
+/**
+ * Config Kafka: usa KafkaProperties fija group.id desde proxy.kafka.group-id
  */
 @Configuration
 @EnableKafka
