@@ -6,16 +6,17 @@ import java.util.List;
 
 /**
  * DTO de request para venta.
+ * fecha y precioVenta son opcionales: el proxy los completa antes de llamar a la cátedra.
  */
 public class VentaRequestDto {
 
     @NotNull
     private Long eventoId;
 
-    @NotNull
+    // Opcional: el proxy completará con Instant.now() en el use case
     private String fecha;
 
-    @NotNull
+    // Opcional: el proxy lo obtiene del evento (precioEntrada)
     private Double precioVenta;
 
     @NotNull

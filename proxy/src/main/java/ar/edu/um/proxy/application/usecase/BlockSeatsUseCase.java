@@ -8,12 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
- * Caso de uso que orquesta el bloqueo de asientos:
- * - Valida reglas de negocio básicas (ej. no fila/columna negativa).
- * - Consulta Redis para estado actual (si es necesario).
- * - Reenvía la petición a la cátedra vía CatedraPort aportando el token desde TokenPort.
+ * Caso de uso reactivo que orquesta el bloqueo de asientos.
  */
 @Service
 public class BlockSeatsUseCase {
@@ -29,27 +28,28 @@ public class BlockSeatsUseCase {
         this.tokenPort = tokenPort;
     }
 
-    public ResponseEntity<String> execute(BloquearAsientosRequestDto request, String rawPayload) throws Exception {
-        // Validaciones de negocio simples:
+    public Mono<ResponseEntity<String>> execute(BloquearAsientosRequestDto request, String rawPayload) {
+        if (request == null) {
+            return Mono.error(new IllegalArgumentException("Request requerido para bloqueo"));
+        }
         if (request.getAsientos() == null || request.getAsientos().isEmpty()) {
-            throw new IllegalArgumentException("Debe informar entre 1 y 4 asientos");
+            return Mono.error(new IllegalArgumentException("Debe informar entre 1 y 4 asientos"));
         }
         request.getAsientos().forEach(a -> {
             if (a.getFila() == null || a.getFila() <= 0) throw new IllegalArgumentException("Fila inválida");
             if (a.getColumna() == null || a.getColumna() <= 0) throw new IllegalArgumentException("Columna inválida");
         });
 
-        try {
-            String redisVal = redis.readAsientosRaw(request.getEventoId());
-            log.debug("Estado redis previo: {}", redisVal);
-        } catch (Exception e) {
-            log.warn("No se pudo leer Redis antes de bloqueo: {}", e.getMessage());
-        }
+        // Lectura de Redis (bloqueante) en boundedElastic
+        Mono<Void> preRead = Mono.fromCallable(() -> redis.readAsientosRaw(request.getEventoId()))
+                .subscribeOn(Schedulers.boundedElastic())
+                .doOnSuccess(redisVal -> log.debug("Estado redis previo: {}", redisVal))
+                .doOnError(e -> log.warn("No se pudo leer Redis antes de bloqueo: {}", e.getMessage()))
+                .onErrorResume(e -> Mono.empty())
+                .then();
 
-        // Reenvío al upstream (Cátedra) usando token del TokenPort
         String bearer = tokenPort.current();
-        ResponseEntity<String> resp = catedra.bloquearAsientos(rawPayload, bearer);
 
-        return resp;
+        return preRead.then(catedra.bloquearAsientos(rawPayload, bearer));
     }
 }

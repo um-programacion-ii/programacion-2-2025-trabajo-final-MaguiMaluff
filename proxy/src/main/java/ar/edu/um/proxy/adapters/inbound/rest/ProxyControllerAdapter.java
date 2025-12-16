@@ -7,16 +7,15 @@ import ar.edu.um.proxy.dto.VentaRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import jakarta.validation.Valid;
 
 /**
- * Adaptador inbound REST: expone endpoints /proxy/... y llama a los UseCases.
- * Nota: recibimos DTO validados y además serializamos el rawPayload que reenviamos al upstream.
+ * Adaptador inbound REST reactivo: expone endpoints /proxy/... y llama a los UseCases.
  */
 @RestController
 @RequestMapping("/proxy")
@@ -36,19 +35,23 @@ public class ProxyControllerAdapter {
         this.mapper = mapper;
     }
 
-    @PostMapping(value = "/bloquear", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> bloquear(@Valid @RequestBody BloquearAsientosRequestDto request) throws Exception {
-        String raw = mapper.writeValueAsString(request); // serializamos el DTO para reenviar al upstream
+    @PostMapping(value = "/bloquear", consumes = "application/json", produces = "application/json")
+    public Mono<ResponseEntity<String>> bloquear(@Valid @RequestBody BloquearAsientosRequestDto request) throws Exception {
+        String raw = mapper.writeValueAsString(request);
         return blockSeatsUseCase.execute(request, raw);
     }
 
-    @PostMapping(value = "/bloquear/raw", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> bloquearRaw(@RequestBody String rawPayload) throws Exception {
-        return blockSeatsUseCase.execute(null, rawPayload);
+    @PostMapping(value = "/bloquear/raw", consumes = "application/json", produces = "application/json")
+    public Mono<ResponseEntity<String>> bloquearRaw(@RequestBody String rawPayload) {
+        if (rawPayload == null || rawPayload.isBlank()) {
+            return Mono.just(ResponseEntity.badRequest().body("{\"error\":\"payload vacío\"}"));
+        }
+
+        return blockSeatsUseCase.execute(new BloquearAsientosRequestDto(), rawPayload);
     }
 
-    @PostMapping(value = "/venta", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> venta(@Valid @RequestBody VentaRequestDto request) throws Exception {
+    @PostMapping(value = "/venta", consumes = "application/json", produces = "application/json")
+    public Mono<ResponseEntity<String>> venta(@Valid @RequestBody VentaRequestDto request) throws Exception {
         String raw = mapper.writeValueAsString(request);
         return sellSeatsUseCase.execute(request, raw);
     }

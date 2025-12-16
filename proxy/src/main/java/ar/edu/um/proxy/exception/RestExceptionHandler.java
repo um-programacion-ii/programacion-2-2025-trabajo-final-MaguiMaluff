@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -21,45 +21,45 @@ public class RestExceptionHandler {
     private final Logger log = LoggerFactory.getLogger(RestExceptionHandler.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorBody> handleValidation(MethodArgumentNotValidException ex, WebRequest req) {
+    public ResponseEntity<ErrorBody> handleValidation(MethodArgumentNotValidException ex, ServerWebExchange exchange) {
         String msg = ex.getBindingResult().getFieldErrors().stream()
                 .map(f -> f.getField() + ": " + f.getDefaultMessage()).collect(Collectors.joining(", "));
-        String path = extractPath(req);
+        String path = extractPath(exchange);
         ErrorBody body = new ErrorBody(Instant.now().toString(), HttpStatus.BAD_REQUEST.value(),
                 "Validation Error", msg, path);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(ProxyNotFoundException.class)
-    public ResponseEntity<ErrorBody> handleNotFound(ProxyNotFoundException ex, WebRequest req) {
-        String path = extractPath(req);
+    public ResponseEntity<ErrorBody> handleNotFound(ProxyNotFoundException ex, ServerWebExchange exchange) {
+        String path = extractPath(exchange);
         ErrorBody body = new ErrorBody(Instant.now().toString(), HttpStatus.NOT_FOUND.value(),
                 "Not Found", ex.getMessage(), path);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
     @ExceptionHandler(ProxyException.class)
-    public ResponseEntity<ErrorBody> handleProxy(ProxyException ex, WebRequest req) {
-        String path = extractPath(req);
+    public ResponseEntity<ErrorBody> handleProxy(ProxyException ex, ServerWebExchange exchange) {
+        String path = extractPath(exchange);
         ErrorBody body = new ErrorBody(Instant.now().toString(), HttpStatus.BAD_REQUEST.value(),
                 "Proxy Error", ex.getMessage(), path);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorBody> handleGeneric(Exception ex, WebRequest req) {
+    public ResponseEntity<ErrorBody> handleGeneric(Exception ex, ServerWebExchange exchange) {
         log.error("Unhandled exception: {}", ex.getMessage(), ex);
-        String path = extractPath(req);
+        String path = extractPath(exchange);
         ErrorBody body = new ErrorBody(Instant.now().toString(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Error", "Ocurrió un error interno en el proxy", path);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
-    private String extractPath(WebRequest req) {
-        String desc = req.getDescription(false);
-        if (desc == null) return "";
-        if (desc.startsWith("uri=")) return desc.substring(4);
-        return desc;
+    private String extractPath(ServerWebExchange exchange) {
+        if (exchange == null || exchange.getRequest() == null || exchange.getRequest().getPath() == null) {
+            return "";
+        }
+        return exchange.getRequest().getPath().value();
     }
 
     public static class ErrorBody {

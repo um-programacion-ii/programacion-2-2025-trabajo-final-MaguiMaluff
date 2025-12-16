@@ -1,9 +1,11 @@
 package ar.edu.um.proxy.config;
 
+import ar.edu.um.proxy.service.TokenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.ClientRequest;
 
 /**
  * Beans WebClient para cátedra y backend.
@@ -19,7 +21,7 @@ public class WebClientConfig {
     }
 
     @Bean("catedraWebClient")
-    public WebClient catedraWebClient() {
+    public WebClient catedraWebClient(TokenService tokenService) {
         return WebClient.builder()
                 .baseUrl(props.getCatedra().getBaseUrl())
                 .defaultHeader("Content-Type", "application/json")
@@ -27,6 +29,21 @@ public class WebClientConfig {
                 .exchangeStrategies(ExchangeStrategies.builder()
                         .codecs(cfg -> cfg.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
                         .build())
+                // Filtro: agrega Authorization Bearer dinámico si hay token y no es el endpoint de login
+                .filter((request, next) -> {
+                    String path = request.url().getPath();
+                    if ("/api/authenticate".equals(path)) {
+                        return next.exchange(request);
+                    }
+                    String token = tokenService.current();
+                    if (token != null && !token.isBlank()) {
+                        ClientRequest rq = ClientRequest.from(request)
+                                .headers(h -> h.setBearerAuth(token))
+                                .build();
+                        return next.exchange(rq);
+                    }
+                    return next.exchange(request);
+                })
                 .build();
     }
 
