@@ -53,10 +53,6 @@ public class CatedraReadAdapter {
         return call(catedra.forzarActualizacion(), "forzar-actualizacion");
     }
 
-    /**
-     * Helper reactivo: propaga status/body de WebClientResponseException y otros errores como 502.
-     * Fuerza Content-Type application/json para que Postman formatee el JSON.
-     */
     private Mono<ResponseEntity<String>> call(Mono<String> op, String nombre) {
         return op
                 .map(body -> ResponseEntity

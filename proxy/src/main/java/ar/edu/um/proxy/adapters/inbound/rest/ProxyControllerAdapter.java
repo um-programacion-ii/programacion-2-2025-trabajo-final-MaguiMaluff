@@ -43,14 +43,10 @@ public class ProxyControllerAdapter {
 
     @PostMapping(value = "/bloquear/raw", consumes = "application/json", produces = "application/json")
     public Mono<ResponseEntity<String>> bloquearRaw(@RequestBody String rawPayload) {
-        // Para la versión raw no podemos validar DTO; si se requiere, se podría añadir parsing previo.
-        // Aquí retornamos error si falta payload.
         if (rawPayload == null || rawPayload.isBlank()) {
             return Mono.just(ResponseEntity.badRequest().body("{\"error\":\"payload vacío\"}"));
         }
-        // No tenemos request DTO para validar filas/columnas; dejar que upstream valide.
-        // Se puede extender parseando y validando si lo necesitás.
-        // Invocamos el usecase con request nulo para evitar doble serialización:
+
         return blockSeatsUseCase.execute(new BloquearAsientosRequestDto(), rawPayload);
     }
 
