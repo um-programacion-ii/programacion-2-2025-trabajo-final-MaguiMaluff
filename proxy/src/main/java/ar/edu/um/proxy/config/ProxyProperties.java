@@ -38,6 +38,7 @@ public class ProxyProperties {
     public static class Redis {
         private String host = "192.168.194.250";
         private int port = 6379;
+        private String seatKeyPattern = "evento_%d";
         public String getHost() { return host; }
         public void setHost(String host) { this.host = host; }
         public int getPort() { return port; }
