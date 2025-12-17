@@ -6,10 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="e5a2d3ca-9778-409b-906a-a933c6425941" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../proxy/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../proxy/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../proxy/src/main/java/ar/edu/um/proxy/ProxyApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/../proxy/src/main/java/ar/edu/um/proxy/ProxyApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../proxy/src/main/java/ar/edu/um/proxy/config/ProxyProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/../proxy/src/main/java/ar/edu/um/proxy/config/ProxyProperties.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../proxy/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../proxy/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/um/backend/proxy/ProxyClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/um/backend/proxy/ProxyClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/um/backend/selection/SelectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/um/backend/selection/SelectionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/um/backend/selection/SelectionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/um/backend/selection/SelectionService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

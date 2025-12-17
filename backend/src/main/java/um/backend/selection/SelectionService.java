@@ -81,4 +81,9 @@ public class SelectionService {
     public Instant defaultBlockTtlUntil() {
         return Instant.now().plus(5, ChronoUnit.MINUTES);
     }
+
+    @Transactional
+    public void updateAfterSale(SelectionStateEntity state) {
+        repo.save(state);
+    }
 }
