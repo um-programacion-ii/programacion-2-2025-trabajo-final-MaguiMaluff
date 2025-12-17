@@ -27,7 +27,6 @@ public class SelectionController {
     private final SalesService sales;
     private final ObjectMapper mapper;
 
-    // FIX: inyectar SalesService correctamente
     public SelectionController(SelectionService service, ProxyClient proxy, SalesService sales, ObjectMapper mapper) {
         this.service = service;
         this.proxy = proxy;
@@ -141,7 +140,6 @@ public class SelectionController {
                                 BigDecimal finalTotal = total;
                                 String finalExternalId = externalId;
 
-                                // FIX: usar lambda en vez de método reference para evitar tipo Object
                                 return Mono.fromCallable(() -> sales.createFromSelection(state, finalExternalId, finalTotal))
                                         .subscribeOn(Schedulers.boundedElastic())
                                         .map(sale -> toConfirmResponse(sale))
