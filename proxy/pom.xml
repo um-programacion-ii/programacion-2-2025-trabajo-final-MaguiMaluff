@@ -10,13 +10,13 @@
 	<packaging>jar</packaging>
 
 	<name>proxy</name>
-	<description>Proxy para cátedra - arquitectura hexagonal</description>
+	<description>Proxy para cátedra</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.5.8</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 
 	<properties>
@@ -48,7 +48,7 @@
 			<artifactId>spring-kafka</artifactId>
 		</dependency>
 
-		<!-- Jackson (ya viene con WebFlux but explicit is fine) -->
+		<!-- Jackson -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
@@ -58,6 +58,12 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+		<!-- Redis -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 
 		<!-- Test -->
