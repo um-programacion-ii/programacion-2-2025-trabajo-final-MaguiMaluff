@@ -8,7 +8,7 @@ import reactor.core.scheduler.Schedulers;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/events")
+@RequestMapping("/api/internal/events")
 public class EventReadController {
 
     private final EventRepository repo;
