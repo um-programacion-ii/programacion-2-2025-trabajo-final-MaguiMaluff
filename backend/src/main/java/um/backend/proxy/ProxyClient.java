@@ -70,7 +70,6 @@ public class ProxyClient {
                 .uri("/proxy/venta")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(payload)
-                // No lanza excepción en 4xx/5xx → inspeccionamos status/body
                 .exchangeToMono(resp -> resp.toEntity(String.class))
                 .doOnNext(re -> log.info("Proxy /venta status={} body={}",
                         re.getStatusCode().value(), re.getBody() != null ? re.getBody() : ""))
