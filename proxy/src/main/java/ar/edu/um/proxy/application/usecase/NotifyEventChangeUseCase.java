@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * Caso de uso que notifica al backend cuando hay un cambio en eventos (triggered por Kafka).
- * Recibe el mensaje raw de Kafka y (opcionalmente) el evento completo.
+ * Recibe el mensaje raw de Kafka y el evento completo.
  */
 @Service
 public class NotifyEventChangeUseCase {

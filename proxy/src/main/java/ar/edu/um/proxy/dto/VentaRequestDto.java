@@ -13,7 +13,7 @@ public class VentaRequestDto {
     @NotNull
     private Long eventoId;
 
-    // Opcional: el proxy completará con Instant.now() en el use case
+    // Opcional: el proxy completa con Instant.now() en el use case
     private String fecha;
 
     // Opcional: el proxy lo obtiene del evento (precioEntrada)

@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .authorizeExchange(auth -> auth
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Solo estas rutas sin token
-                        .pathMatchers(HttpMethod.POST, "/api/auth/signup", "/api/auth/login").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/auth/signup", "/api/auth/login", "/api/proxy/event-change").permitAll()
                         // TODO lo demás requiere JWT
                         .anyExchange().authenticated()
                 )

@@ -72,7 +72,5 @@ public class SelectionStateEntity {
     public Instant getBloqueadoHasta() { return bloqueadoHasta; }
     public void setBloqueadoHasta(Instant bloqueadoHasta) { this.bloqueadoHasta = bloqueadoHasta; }
 
-    public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
-    public Long getVersion() { return version; }
 }

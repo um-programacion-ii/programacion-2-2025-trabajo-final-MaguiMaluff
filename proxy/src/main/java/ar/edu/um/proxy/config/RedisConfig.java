@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * Configuración Redis (Lettuce + RedisTemplate<String,String>).
+ * Configuración Redis
  */
 @Configuration
 public class RedisConfig {

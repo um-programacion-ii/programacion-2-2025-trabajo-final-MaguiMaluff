@@ -21,7 +21,7 @@ proxy:
     seat-key-pattern: "evento_%d"
   catedra:
     base-url: ${CATEDRA_BASE_URL:http://192.168.194.250:8080}
-    username: ${CATEDRA_USERNAME:magui}
+    username: ${CATEDRA_USERNAME:magui2}
     password: ${CATEDRA_PASSWORD:holamagui}
     refresh-interval-ms: ${CATEDRA_REFRESH_INTERVAL_MS:1800000}
   backend:
