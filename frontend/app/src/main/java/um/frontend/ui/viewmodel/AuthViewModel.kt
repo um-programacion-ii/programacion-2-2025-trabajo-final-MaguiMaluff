@@ -89,20 +89,31 @@ class SelectionViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
-    suspend fun startSelectionAwait(eventoId: Long): SelectionResponseDto? {
+    suspend fun ensureSelection(eventoId: Long): SelectionResponseDto? {
         val userId = tokenStore.getUserId()
         if (userId.isNullOrBlank()) {
-            _error.value = "No hay usuario en sesión. Iniciá sesión nuevamente."
+            _error.value = "No hay usuario en sesión. Iniciá sesión."
             return null
         }
+        val current = _selection.value
+        if (current != null && current.eventoId == eventoId) return current
+
         _error.value = null
         return runCatching { repo.createSelection(userId, eventoId) }
             .onSuccess { _selection.value = it }
             .onFailure { _error.value = it.message }
             .getOrNull()
     }
-    fun startSelection(eventoId: Long) = viewModelScope.launch { startSelectionAwait(eventoId) }
 
+    suspend fun confirmAwait(): Boolean {
+        val sel = _selection.value ?: return false
+        _loading.value = true; _error.value = null
+        val ok = runCatching { repo.confirm(sel.id) }
+            .onFailure { _error.value = it.message }
+            .isSuccess
+        _loading.value = false
+        return ok
+    }
     fun setSeats(seats: List<SeatDto>) = viewModelScope.launch {
         val sel = _selection.value ?: return@launch
         _error.value = null
@@ -145,5 +156,18 @@ class SelectionViewModel(
     fun hasSeatsAndNames(): Boolean {
         val sel = _selection.value ?: return false
         return sel.seats.isNotEmpty() && sel.names.size == sel.seats.size
+    }
+    fun nextStepRoute(eventId: Long): String {
+        val sel = _selection.value
+        val seats = sel?.seats?.size ?: 0
+        val names = sel?.names?.size ?: 0
+        val blocked = isBlockedValid()
+
+        return when {
+            seats == 0 -> "seats/$eventId"                // no hay asientos aún
+            names < seats -> "names/$eventId"             // faltan nombres → ir a Nombres
+            blocked -> "checkout/$eventId"               // bloqueado y nombres completos → pagar
+            else -> "seats/$eventId"                     // por seguridad, volver a asientos/bloqueo
+        }
     }
 }

@@ -23,7 +23,7 @@ fun NamesScreen(
     val selection by selectionVM.selection.collectAsState()
     val error by selectionVM.error.collectAsState()
 
-    LaunchedEffect(eventId) { selectionVM.startSelection(eventId) }
+    LaunchedEffect(eventId) { selectionVM.ensureSelection(eventId) }
 
     val seats: List<SeatDto> = selection?.seats ?: emptyList()
     val names = remember(seats) { mutableStateListOf<String>().apply { repeat(seats.size) { add("") } } }
@@ -62,8 +62,10 @@ fun NamesScreen(
             Button(
                 onClick = {
                     scope.launch {
-                        val ok = selectionVM.setNamesAwait(names.toList())
-                        if (ok) onNext()
+                        val saved = selectionVM.setNamesAwait(names.toList())
+                        if (!saved) return@launch
+                        val blocked = selectionVM.blockAwait()
+                        if (blocked) onNext()
                     }
                 },
                 enabled = allFilled

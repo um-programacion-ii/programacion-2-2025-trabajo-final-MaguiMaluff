@@ -32,9 +32,10 @@ fun AppNavGraph(
     authVM: AuthViewModel,
     onTokenUpdate: (String?) -> Unit,
     eventsVM: EventsViewModel,
-    selectionVM: SelectionViewModel
+    selectionVM: SelectionViewModel,
+    startDestination: String = Routes.Login
 ) {
-    NavHost(navController, startDestination = Routes.Login) {
+    NavHost(navController, startDestination = startDestination) {
         composable(Routes.Login) {
             Scaffold(topBar = { CenterAlignedTopAppBar(title = { Text("UM Eventos") }) }) { padding ->
                 LoginScreen(
@@ -73,8 +74,9 @@ fun AppNavGraph(
             Scaffold(topBar = { CenterAlignedTopAppBar(title = { Text("Detalle del evento") }) }) { padding ->
                 EventDetailScreen(
                     eventsVM = eventsVM,
+                    selectionVM = selectionVM,
                     eventId = id,
-                    onStartSelection = { navController.navigate("seats/$id") },
+                    onNavigateTo = { route -> navController.navigate(route) },
                     modifier = Modifier.padding(padding)
                 )
             }

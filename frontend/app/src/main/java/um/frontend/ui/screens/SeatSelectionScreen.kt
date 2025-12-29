@@ -27,7 +27,7 @@ fun SeatSelectionScreen(
     var snackbar by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(eventId) {
-        ready = selectionVM.startSelectionAwait(eventId) != null
+        ready = selectionVM.ensureSelection(eventId) != null
         eventsVM.loadSeatMap(eventId)
     }
 

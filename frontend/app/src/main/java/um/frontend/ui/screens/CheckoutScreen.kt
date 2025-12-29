@@ -5,6 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import um.frontend.ui.viewmodel.SelectionViewModel
 
 @Composable
@@ -14,11 +15,12 @@ fun CheckoutScreen(
     onDone: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val scope = rememberCoroutineScope()
     val loading by selectionVM.loading.collectAsState()
     val error by selectionVM.error.collectAsState()
     val selection by selectionVM.selection.collectAsState()
 
-    LaunchedEffect(eventId) { selectionVM.startSelection(eventId) }
+    LaunchedEffect(eventId) { selectionVM.ensureSelection(eventId) }
 
     val canConfirm = selectionVM.isBlockedValid() && selectionVM.hasSeatsAndNames()
 
@@ -38,7 +40,12 @@ fun CheckoutScreen(
 
         Spacer(Modifier.height(8.dp))
         Button(
-            onClick = { selectionVM.confirm() },
+            onClick = {
+                scope.launch {
+                    val ok = selectionVM.confirmAwait()
+                    if (ok) onDone()
+                }
+            },
             enabled = canConfirm && !loading
         ) { Text(if (loading) "Confirmando..." else "Confirmar") }
 

@@ -11,6 +11,8 @@ import um.frontend.data.repo.SelectionRepository
 import um.frontend.data.store.TokenStore
 import um.frontend.ui.navigation.AppNavGraph
 import um.frontend.ui.theme.UmTheme
+import um.frontend.ui.navigation.Routes
+
 import um.frontend.ui.viewmodel.*
 
 class MainActivity : ComponentActivity() {
@@ -24,7 +26,7 @@ class MainActivity : ComponentActivity() {
         val authVM = AuthViewModel(AuthRepository(api), tokenStore)
         val eventsVM = EventsViewModel(EventsRepository(api))
         val selectionVM = SelectionViewModel(SelectionRepository(api), tokenStore)
-
+        val startDest = if (cachedToken.isNullOrBlank()) Routes.Login else Routes.Events
         setContent {
             UmTheme {
                 val nav = rememberNavController()
