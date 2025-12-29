@@ -27,20 +27,19 @@ public class SeatsWarmupService {
     }
 
     public Mono<String> getOrWarmOverlay(long eventoId) {
-        // 1) Intento leer de Redis (bloqueante → boundedElastic)
+        // 1) Intento leer de Redis
         return Mono.fromCallable(() -> repo.findSeatMapRaw(eventoId))
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMap(opt -> opt.map(Mono::just).orElseGet(() ->
                         // 2) No existe → construir overlay desde "ventas"
                         catedra.ventas()
                                 .map(json -> buildOverlayFromVentas(json, eventoId))
-                                // Si la cátedra falla, devolvemos overlay vacío para no romper clientes
+                                // Si la cátedra falla, devuelve overlay vacío para no romper clientes
                                 .onErrorResume(e -> Mono.just(emptyOverlay(eventoId)))
-                                // 3) Guardar con SETNX (bloqueante → boundedElastic)
+                                // 3) Guardar
                                 .flatMap(overlay -> Mono.fromCallable(() -> {
                                             boolean created = repo.setIfAbsent(eventoId, overlay);
                                             if (!created) {
-                                                // otro hilo la creó; leer lo existente
                                                 return repo.findSeatMapRaw(eventoId).orElse(overlay);
                                             }
                                             return overlay;
@@ -53,7 +52,7 @@ public class SeatsWarmupService {
         try {
             JsonNode root = mapper.readTree(ventasJson);
 
-            // El JSON de "ventas" puede venir como array o envuelto; cubrimos ambos casos:
+            // El JSON de "ventas" puede venir como array o envuelto;
             // - Array en la raíz
             // - Objeto con campo "ventas" (array)
             ArrayNode ventasArray;
@@ -72,7 +71,7 @@ public class SeatsWarmupService {
                 // Intentamos ubicar el ID de evento de varias formas habituales
                 long evId = v.path("eventoId").asLong(
                         v.at("/evento/id").asLong(
-                                v.path("evento").asLong(-1) // fallback poco común
+                                v.path("evento").asLong(-1)
                         )
                 );
                 if (evId != eventoId) continue;

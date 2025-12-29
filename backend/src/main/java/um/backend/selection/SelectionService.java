@@ -63,7 +63,7 @@ public class SelectionService {
         SelectionStateEntity s = repo.findById(selectionId).orElseThrow();
         s.setNames(names == null ? List.of() : names);
         if (!s.getNames().isEmpty()) {
-            s.setStage(SelectionStage.FILLED_NAMES);
+            s.setStage(SelectionStage.BLOCKED);
         } else if (s.getStage() == SelectionStage.FILLED_NAMES) {
             s.setStage(SelectionStage.SELECTING);
         }

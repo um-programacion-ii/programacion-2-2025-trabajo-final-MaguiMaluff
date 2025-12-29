@@ -29,7 +29,6 @@ public class WebClientConfig {
                 .exchangeStrategies(ExchangeStrategies.builder()
                         .codecs(cfg -> cfg.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
                         .build())
-                // Filtro: agrega Authorization Bearer dinámico si hay token y no es el endpoint de login
                 .filter((request, next) -> {
                     String path = request.url().getPath();
                     if ("/api/authenticate".equals(path)) {

@@ -25,7 +25,7 @@ public class ProxyProperties {
 
     public static class Kafka {
         private String topic = "eventos-actualizacion";
-        private String groupId = "alumno-default";
+        private String groupId = "proxy-maguimaluff";
         private boolean enrich = false;
         public String getTopic() { return topic; }
         public void setTopic(String topic) { this.topic = topic; }

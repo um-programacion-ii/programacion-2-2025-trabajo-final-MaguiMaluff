@@ -40,7 +40,6 @@ public class BlockSeatsUseCase {
             if (a.getColumna() == null || a.getColumna() <= 0) throw new IllegalArgumentException("Columna inválida");
         });
 
-        // Lectura de Redis (bloqueante) en boundedElastic
         Mono<Void> preRead = Mono.fromCallable(() -> redis.readAsientosRaw(request.getEventoId()))
                 .subscribeOn(Schedulers.boundedElastic())
                 .doOnSuccess(redisVal -> log.debug("Estado redis previo: {}", redisVal))

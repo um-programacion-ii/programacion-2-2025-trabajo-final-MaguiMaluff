@@ -27,14 +27,7 @@ public class ProxyWebhookController {
 
     @PostMapping(value = "/event-change", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Map<String, Object>>> eventChange(
-            @RequestHeader(name = "X-Proxy-Secret", required = false) String provided,
             @RequestBody(required = false) Map<String, Object> body) {
-
-        if (!secret.isBlank()) {
-            if (provided == null || !secret.equals(provided)) {
-                return Mono.just(ResponseEntity.status(401).body(Map.<String,Object>of("status", "unauthorized")));
-            }
-        }
 
         Long eventId;
         if (body != null && body.get("eventId") instanceof Number num) {
