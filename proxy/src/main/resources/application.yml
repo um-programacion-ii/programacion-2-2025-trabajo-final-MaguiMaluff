@@ -1,0 +1,30 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: proxy
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:192.168.194.250:9092}
+  redis:
+    host: ${REDIS_HOST:192.168.194.250}
+    port: ${REDIS_PORT:6379}
+
+proxy:
+  kafka:
+    topic: ${PROXY_KAFKA_TOPIC:eventos-actualizacion}
+    group-id: ${PROXY_KAFKA_GROUP_ID:proxy-maguimaluff}
+    enrich: ${PROXY_KAFKA_ENRICH:false}
+  redis:
+    host: ${REDIS_HOST:192.168.194.250}
+    port: ${REDIS_PORT:6379}
+    seat-key-pattern: "evento_%d"
+  catedra:
+    base-url: ${CATEDRA_BASE_URL:http://192.168.194.250:8080}
+    username: ${CATEDRA_USERNAME:magui2}
+    password: ${CATEDRA_PASSWORD:holamagui}
+    refresh-interval-ms: ${CATEDRA_REFRESH_INTERVAL_MS:1800000}
+  backend:
+    base-url: ${PROXY_BACKEND_BASE_URL:http://localhost:8090}
+  security:
+    disable: ${PROXY_SECURITY_DISABLE:true}
